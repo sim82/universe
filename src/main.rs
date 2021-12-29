@@ -1,14 +1,23 @@
-use bevy::{prelude::*, render::primitives::Frustum, scene::InstanceId};
+use bevy::{prelude::*, reflect::TypeRegistry, render::primitives::Frustum, scene::InstanceId};
+use heron::*;
+use universe::prelude::*;
 
 #[derive(Component)]
 struct Planet {
     vel: f32,
 }
 
-#[derive(Component)]
+#[derive(Component, Reflect)]
 struct Center {
     vel: f32,
     name: String,
+}
+
+#[derive(Component)]
+struct BodyAppearance {
+    radius: f32,
+    model: String,
+    vel: f32,
 }
 
 impl Center {
@@ -27,6 +36,7 @@ struct Rotation {
 
 fn main() {
     App::new()
+        .register_type::<Center>()
         .insert_resource(WindowDescriptor {
             width: 1270.0,
             height: 720.0,
@@ -34,12 +44,14 @@ fn main() {
             ..Default::default()
         })
         .add_plugins(DefaultPlugins)
+        .add_plugin(PhysicsPlugin::default())
         .add_startup_system(setup)
         .add_system(spawn_planets)
         // .add_system(animate_light_direction)
         .add_system(animate_camera)
         .add_system(turn_earth)
         .add_system(rotation_system)
+        .add_system(ship::acceleration_system)
         .run();
 }
 
@@ -65,100 +77,61 @@ fn planet_bundle(name: &str, radius: f32, asset_server: &AssetServer) -> PbrBund
     }
 }
 
-const KILOMETER: f32 = 1e3;
-
-const RADIUS_SUN: f32 = 1400000.0 * KILOMETER;
-const ORBIT_EARTH: f32 = 140000000.0 * KILOMETER;
-const RADIUS_EARTH: f32 = 6100.0 * KILOMETER * 1.0;
-const RADIUS_MOON: f32 = 1700.0 * KILOMETER;
-const ORBIT_MOON: f32 = 370000.0 * KILOMETER;
+fn spawn_satellites(bodies: &[universe::Body], f: &mut ChildBuilder) {
+    for body in bodies.iter() {
+        let oribit_vel = if body.orbit_time > 0.0 {
+            1.0 / body.orbit_time
+        } else {
+            0.0
+        };
+        let vel = if body.day > 0.0 { 1.0 / body.day } else { 0.0 };
+        f.spawn_bundle(TransformNodeBundle::default())
+            .insert(Rotation { vel: oribit_vel })
+            .with_children(|f| {
+                f.spawn_bundle(TransformNodeBundle {
+                    transform: Transform::from_translation(Vec3::new(
+                        body.orbit * KILOMETER,
+                        0.0,
+                        0.0,
+                    )),
+                    ..Default::default()
+                })
+                .insert(Center::new(&body.name))
+                .insert(BodyAppearance {
+                    radius: body.radius,
+                    model: body.appearance.clone(),
+                    vel,
+                })
+                //.insert(Rotation { vel })
+                .with_children(|f| {
+                    spawn_satellites(&body.satellites, f);
+                });
+            });
+    }
+}
 
 fn setup(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
-    let sun = commands
+    let sun: universe::Body = serde_yaml::from_reader(std::io::BufReader::new(
+        std::fs::File::open("assets/system.yaml").unwrap(),
+    ))
+    .unwrap();
+
+    commands
         .spawn_bundle(TransformNodeBundle::default())
-        .insert(Center::new("sun"))
+        .insert(Center::new(&sun.name))
+        .insert(BodyAppearance {
+            radius: sun.radius,
+            model: sun.appearance,
+            vel: 0.0,
+        })
+        .with_children(|f| {
+            spawn_satellites(&sun.satellites, f);
+        })
         .id();
-
-    commands.entity(sun).with_children(|f| {
-        f.spawn_bundle(TransformNodeBundle::default())
-            .insert(Rotation { vel: 0.03 })
-            .with_children(|f| {
-                f.spawn_bundle(TransformNodeBundle {
-                    transform: Transform::from_translation(Vec3::new(ORBIT_EARTH, 0.0, 0.0)),
-                    ..Default::default()
-                })
-                .insert(Center::new("earth"))
-                .with_children(|f| {
-                    f.spawn_bundle(TransformNodeBundle::default())
-                        .insert(Rotation { vel: 0.03 })
-                        .with_children(|f| {
-                            f.spawn_bundle(TransformNodeBundle {
-                                transform: Transform::from_translation(Vec3::new(
-                                    ORBIT_MOON, 0.0, 0.0,
-                                )),
-                                ..Default::default()
-                            })
-                            .insert(Center::new("moon"));
-                        });
-                });
-            });
-    });
-
-    // let earth_rot = earth_rot.unwrap();
-
-    // let mut earth_trans = None;
-    // commands.entity(sun).with_children(|f| {
-    //     earth_trans = Some(
-
-    //         .id(),
-    //     );
-    // });
-
-    // let earth_trans = earth_trans.unwrap();
-
-    // commands.entity(earth_trans).with_children(|f| {
-    //     f.spawn_bundle(planet_bundle(
-    //         "models/earth_gltf02/earth.gltf",
-    //         RADIUS_EARTH,
-    //         &asset_server,
-    //     ))
-    //     .insert(Rotation { vel: 0.03 });
-    // });
-
-    // commands
-    //     .spawn_bundle(planet_bundle(
-    //         "models/earth_gltf02/earth.gltf",
-    //         RADIUS_EARTH,
-    //         &asset_server,
-    //     ))
-    //     .insert(Planet { vel: 0.03 });
-    // let x = 370000000.0;
-
-    // commands
-    //     .spawn_bundle(TransformNodeBundle::default())
-    //     .insert(Planet { vel: 0.3 })
-    //     .with_children(|f| {
-    //         f.spawn_bundle(TransformNodeBundle {
-    //             transform: Transform::from_translation(Vec3::new(x, 0.0, 0.0)),
-    //             ..Default::default()
-    //         })
-    //         .insert(Planet { vel: 0.03 })
-    //         .with_children(|f| {
-    //             f.spawn_bundle(planet_bundle(
-    //                 "models/moon_gltf01/moon.gltf",
-    //                 RADIUS_MOON,
-    //                 &asset_server,
-    //             ));
-    //         });
-
-    //         // .insert(Planet);
-    //     });
-
-    // commands
 
     let perspective_projection = PerspectiveProjection {
         fov: std::f32::consts::PI / 4.0,
@@ -167,15 +140,38 @@ fn setup(
         aspect_ratio: 1.0,
     };
 
-    //commands.spawn_scene(asset_server.load("models/earth_gltf01/earth.gltf#Scene0"));
-    commands.spawn_bundle(PerspectiveCameraBundle {
-        transform: Transform::from_xyz(ORBIT_EARTH, 10e6, 0.0)
-            .looking_at(Vec3::new(ORBIT_EARTH, 0.0, 0.0), Vec3::Z),
-        // transform: Transform::from_xyz(0.0, RADIUS_EARTH * 10.0, 0.0)
-        //     .looking_at(Vec3::new(0.0, 0.0, 0.0), -Vec3::Z),
-        perspective_projection,
-        ..Default::default()
-    });
+    // Cube (with radius)
+    let ship = commands
+        .spawn_bundle(TransformNodeBundle::default())
+        .insert(Transform {
+            translation: Vec3::new(
+                ORBIT_EARTH * 1e-1 + RADIUS_EARTH + 100.0 * KILOMETER,
+                0.0,
+                0.0,
+            ),
+            ..Default::default()
+        })
+        .insert(RigidBody::Dynamic)
+        .insert(CollisionShape::Cuboid {
+            half_extends: Vec3::new(0.3, 0.3, 0.3),
+            border_radius: Some(0.3),
+        })
+        .insert(Acceleration::default())
+        .insert(Velocity::default())
+        //.insert(Velocity::from_angular(AxisAngle::new(Vec3::X, 1.0)))
+        .insert(ship::Ship {})
+        .with_children(|f| {
+            f.spawn_bundle(PerspectiveCameraBundle {
+                // transform: Transform::from_xyz(ORBIT_EARTH, 10e6, 0.0)
+                //     .looking_at(Vec3::new(ORBIT_EARTH, 0.0, 0.0), Vec3::Z),
+                transform: Transform::from_xyz(0.0, 0.0, 0.0)
+                    .looking_at(Vec3::new(-1.0, 0.0, 0.0), Vec3::Y),
+                perspective_projection,
+                ..Default::default()
+            });
+        })
+        .id();
+
     const HALF_SIZE: f32 = 1.0;
     commands.spawn_bundle(DirectionalLightBundle {
         directional_light: DirectionalLight {
@@ -194,48 +190,28 @@ fn setup(
         ..Default::default()
     });
 }
+
 fn spawn_planets(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
     mut materials: ResMut<Assets<StandardMaterial>>,
-    mut query: Query<(Entity, &Center), Added<Center>>,
+    mut query: Query<(Entity, &Center, &BodyAppearance), Added<Center>>,
 ) {
-    for (entity, center) in query.iter() {
-        info!("spwan {}", center.name);
-        match center.name.as_str() {
-            "sun" => {
-                commands.entity(entity).with_children(|f| {
-                    f.spawn_bundle(planet_bundle(
-                        "models/earth_gltf02/earth.gltf",
-                        RADIUS_SUN,
-                        &asset_server,
-                    ))
-                    .insert(Rotation { vel: 0.03 });
-                });
-            }
-            "earth" => {
-                commands.entity(entity).with_children(|f| {
-                    f.spawn_bundle(planet_bundle(
-                        "models/earth_gltf02/earth.gltf",
-                        RADIUS_EARTH,
-                        &asset_server,
-                    ))
-                    .insert(Rotation { vel: 0.03 });
-                });
-            }
-            "moon" => {
-                commands.entity(entity).with_children(|f| {
-                    f.spawn_bundle(planet_bundle(
-                        "models/moon_gltf01/moon.gltf",
-                        RADIUS_MOON,
-                        &asset_server,
-                    ))
-                    .insert(Rotation { vel: 0.03 });
-                });
-            }
-
-            _ => (),
-        }
+    for (entity, center, appearance) in query.iter() {
+        info!(
+            "spawn {} {} {} {}",
+            center.name, appearance.model, appearance.radius, appearance.vel
+        );
+        commands.entity(entity).with_children(|f| {
+            f.spawn_bundle(planet_bundle(
+                &format!("models/{}", appearance.model),
+                appearance.radius * KILOMETER,
+                &asset_server,
+            ))
+            .insert(Rotation {
+                vel: appearance.vel,
+            });
+        });
     }
 }
 fn animate_light_direction(
@@ -269,7 +245,7 @@ fn turn_earth(time: Res<Time>, mut query: Query<(&mut Transform, &Planet)>) {
 
 fn rotation_system(time: Res<Time>, mut query: Query<(&mut Transform, &Rotation)>) {
     for (mut transform, rotation) in query.iter_mut() {
-        transform.rotation *= Quat::from_rotation_y(rotation.vel * 0.0001 * time.delta_seconds());
+        transform.rotation *= Quat::from_rotation_y(rotation.vel * 1.0e-1 * time.delta_seconds());
         // transform.translation.x += 1000.0;
         // info!("camera: {:?} {:?}", transform.translation, frustum);
     }

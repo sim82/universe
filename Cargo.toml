@@ -7,9 +7,10 @@ edition = "2021"
 
 [dependencies]
 bevy = { git = "https://github.com/bevyengine/bevy", features = ["dynamic"] }
-log = "^0.4"
-anyhow = { version="^1"}
-rand = "^0.8"
-env_logger = "^0.8"
-serde = { version = "^1", features = ["derive"] }
-serde_json = { version="^1" }
+log = "0.4"
+anyhow = { version="1"}
+rand = "0.8"
+serde = { version = "1", features = ["derive"] }
+serde_json = { version="1" }
+serde_yaml = "0.8"
+heron = { git = "https://github.com/jcornaz/heron.git", branch = "bevy-main", features = ["3d"] }

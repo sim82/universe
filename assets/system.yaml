@@ -1,0 +1,22 @@
+name: sun
+orbit: 0.0
+orbit_time: 0.0
+day: -365.0
+radius: 140000.0
+appearance: earth_gltf02/earth.gltf
+satellites:
+  - name: earth
+    orbit: 1400000.0
+    orbit_time: 365.0
+    day: 1.0
+    radius: 6100.0
+    appearance: earth_gltf02/earth.gltf
+    satellites:
+      - name: moon
+        orbit: 370000.0
+        orbit_time: 31.0
+        day: 31.0
+        satellites: []
+        radius: 1700.0
+        appearance: moon_gltf01/moon.gltf
+    
