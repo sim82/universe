@@ -34,6 +34,11 @@ struct Rotation {
     vel: f32,
 }
 
+enum InSystemVisibility {
+    SolarSystem,
+    Local,
+}
+
 fn main() {
     App::new()
         .register_type::<Center>()
@@ -47,6 +52,7 @@ fn main() {
         .add_plugin(PhysicsPlugin::default())
         .add_startup_system(setup)
         .add_system(spawn_planets)
+        .add_system(spawn_ship)
         // .add_system(animate_light_direction)
         .add_system(animate_camera)
         .add_system(turn_earth)
@@ -187,57 +193,78 @@ fn spawn_planets(
     mut query: Query<(Entity, &Center, &BodyAppearance, &GlobalTransform), Added<Center>>,
 ) {
     for (entity, center, appearance, global_transform) in query.iter() {
-        if center.name == "ship" {
-            let perspective_projection = PerspectiveProjection {
-                fov: std::f32::consts::PI / 4.0,
-                near: 0.000000001,
-                far: 2.0 * AU_TO_UNIT,
-                aspect_ratio: 1.0,
-            };
-            let _ship = commands
-                .spawn_bundle(TransformNodeBundle::default())
-                .insert(Transform {
-                    translation: global_transform.translation,
-                    ..Default::default()
-                })
-                .insert(RigidBody::Dynamic)
-                .insert(CollisionShape::Cuboid {
-                    half_extends: Vec3::new(0.3, 0.3, 0.3),
-                    border_radius: Some(0.3),
-                })
-                .insert(Acceleration::default())
-                .insert(Velocity::default())
-                //.insert(Velocity::from_angular(AxisAngle::new(Vec3::X, 1.0)))
-                .insert(ship::Ship {})
-                .with_children(|f| {
-                    f.spawn_bundle(PerspectiveCameraBundle {
-                        // transform: Transform::from_xyz(ORBIT_EARTH, 10e6, 0.0)
-                        //     .looking_at(Vec3::new(ORBIT_EARTH, 0.0, 0.0), Vec3::Z),
-                        transform: Transform::from_xyz(0.0, 0.0, 0.0)
-                            .looking_at(Vec3::new(-1.0, 0.0, 0.0), Vec3::Y),
-                        perspective_projection,
-                        ..Default::default()
-                    });
-                })
-                .id();
-        } else {
-            info!(
-                "spawn {} {} {} {}",
-                center.name, appearance.model, appearance.radius, appearance.vel
-            );
-            commands.entity(entity).with_children(|f| {
-                f.spawn_bundle(planet_bundle(
-                    &format!("models/{}", appearance.model),
-                    appearance.radius,
-                    &asset_server,
-                ))
-                .insert(Rotation {
-                    vel: appearance.vel,
-                });
-            });
+        if center.name.starts_with("ship") {
+            continue;
         }
+        info!(
+            "spawn {} {} {} {}",
+            center.name, appearance.model, appearance.radius, appearance.vel
+        );
+        let radius = if center.name == "sun" {
+            appearance.radius
+        } else {
+            appearance.radius * RADIUS_BOOST
+        };
+
+        commands.entity(entity).with_children(|f| {
+            f.spawn_bundle(planet_bundle(
+                &format!("models/{}", appearance.model),
+                radius,
+                &asset_server,
+            ))
+            .insert(Rotation {
+                vel: appearance.vel,
+            });
+        });
     }
 }
+
+fn spawn_ship(
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+    mut materials: ResMut<Assets<StandardMaterial>>,
+    mut query: Query<(Entity, &Center, &BodyAppearance, &GlobalTransform), Added<Center>>,
+) {
+    for (entity, center, appearance, global_transform) in query.iter() {
+        if center.name != "ship" {
+            continue;
+        }
+        let perspective_projection = PerspectiveProjection {
+            fov: std::f32::consts::PI / 4.0,
+            near: 0.000000001,
+            far: 40.0 * AU_TO_UNIT,
+            aspect_ratio: 1.0,
+        };
+        let elevate = 0.5;
+        let _ship = commands
+            .spawn_bundle(TransformNodeBundle::default())
+            .insert(Transform {
+                translation: global_transform.translation,
+                ..Default::default()
+            })
+            .insert(RigidBody::Dynamic)
+            .insert(CollisionShape::Cuboid {
+                half_extends: Vec3::new(0.3, 0.3, 0.3),
+                border_radius: Some(0.3),
+            })
+            .insert(Acceleration::default())
+            .insert(Velocity::default())
+            //.insert(Velocity::from_angular(AxisAngle::new(Vec3::X, 1.0)))
+            .insert(ship::Ship {})
+            .with_children(|f| {
+                f.spawn_bundle(PerspectiveCameraBundle {
+                    // transform: Transform::from_xyz(ORBIT_EARTH, 10e6, 0.0)
+                    //     .looking_at(Vec3::new(ORBIT_EARTH, 0.0, 0.0), Vec3::Z),
+                    transform: Transform::from_xyz(0.0, elevate, 0.0)
+                        .looking_at(Vec3::new(-1.0, elevate, 0.0), Vec3::Y),
+                    perspective_projection,
+                    ..Default::default()
+                });
+            })
+            .id();
+    }
+}
+
 fn animate_light_direction(
     time: Res<Time>,
     mut query: Query<&mut Transform, With<DirectionalLight>>,
@@ -269,7 +296,7 @@ fn turn_earth(time: Res<Time>, mut query: Query<(&mut Transform, &Planet)>) {
 
 fn rotation_system(time: Res<Time>, mut query: Query<(&mut Transform, &Rotation)>) {
     for (mut transform, rotation) in query.iter_mut() {
-        transform.rotation *= Quat::from_rotation_y(rotation.vel * 1.0e-3 * time.delta_seconds());
+        transform.rotation *= Quat::from_rotation_y(rotation.vel * 1.0e0 * time.delta_seconds());
         // transform.translation.x += 1000.0;
         // info!("camera: {:?} {:?}", transform.translation, frustum);
     }

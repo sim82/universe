@@ -14,6 +14,7 @@ pub mod consts {
     // pub const KM_TO_UNIT: f32 = KILOMETER / 100.0;
     pub const AU_TO_UNIT: f32 = 1.0;
     pub const KM_TO_UNIT: f32 = KILOMETER / AU;
+    pub const RADIUS_BOOST: f32 = 1e2;
     // pub const RADIUS_SUN: f32 = 1400000.0 * KILOMETER;
     // pub const ORBIT_EARTH: f32 = 14000000.0 * KILOMETER;
     // pub const RADIUS_EARTH: f32 = 6100.0 * KILOMETER * 1.0;
