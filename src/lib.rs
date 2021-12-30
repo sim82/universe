@@ -8,12 +8,17 @@ pub mod prelude {
 }
 
 pub mod consts {
-    pub const KILOMETER: f32 = 1e-3;
-    pub const RADIUS_SUN: f32 = 1400000.0 * KILOMETER;
-    pub const ORBIT_EARTH: f32 = 14000000.0 * KILOMETER;
-    pub const RADIUS_EARTH: f32 = 6100.0 * KILOMETER * 1.0;
-    pub const RADIUS_MOON: f32 = 1700.0 * KILOMETER;
-    pub const ORBIT_MOON: f32 = 370000.0 * KILOMETER;
+    pub const KILOMETER: f32 = 1e3;
+    pub const AU: f32 = 1.495_978_6e11;
+    // pub const AU_TO_UNIT: f32 = AU / 100.0;
+    // pub const KM_TO_UNIT: f32 = KILOMETER / 100.0;
+    pub const AU_TO_UNIT: f32 = 1.0;
+    pub const KM_TO_UNIT: f32 = KILOMETER / AU;
+    // pub const RADIUS_SUN: f32 = 1400000.0 * KILOMETER;
+    // pub const ORBIT_EARTH: f32 = 14000000.0 * KILOMETER;
+    // pub const RADIUS_EARTH: f32 = 6100.0 * KILOMETER * 1.0;
+    // pub const RADIUS_MOON: f32 = 1700.0 * KILOMETER;
+    // pub const ORBIT_MOON: f32 = 370000.0 * KILOMETER;
 }
 
 #[derive(Serialize, Deserialize)]
