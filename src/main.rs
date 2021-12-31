@@ -54,10 +54,10 @@ fn main() {
         .add_startup_system(setup)
         .add_system(spawn_planets)
         .add_system(spawn_ship)
-        // .add_system(animate_light_direction)
+        .add_system(animate_light_direction)
         .add_system(animate_camera)
         .add_system(turn_earth)
-        // .add_system(rotation_system)
+        .add_system(rotation_system)
         .add_system(ship::acceleration_system)
         .run();
 }
@@ -97,9 +97,9 @@ fn spawn_satellites(bodies: &[universe::Body], f: &mut ChildBuilder) {
             .with_children(|f| {
                 f.spawn_bundle(TransformNodeBundle {
                     transform: Transform::from_translation(Vec3::new(
-                        body.orbit * AU_TO_UNIT,
                         0.0,
                         0.0,
+                        body.orbit * AU_TO_UNIT * ORBIT_MUL,
                     )),
                     ..Default::default()
                 })
@@ -180,7 +180,7 @@ fn setup(
                 far: 10.0 * HALF_SIZE,
                 ..Default::default()
             },
-            shadows_enabled: true,
+            shadows_enabled: false,
             ..Default::default()
         },
         ..Default::default()
@@ -257,7 +257,7 @@ fn spawn_ship(
                     // transform: Transform::from_xyz(ORBIT_EARTH, 10e6, 0.0)
                     //     .looking_at(Vec3::new(ORBIT_EARTH, 0.0, 0.0), Vec3::Z),
                     transform: Transform::from_xyz(0.0, elevate, 0.0)
-                        .looking_at(Vec3::new(-1.0, elevate, 0.0), Vec3::Y),
+                        .looking_at(Vec3::new(0.0, elevate, -1.0), Vec3::Y),
                     perspective_projection,
                     ..Default::default()
                 });

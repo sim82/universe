@@ -20,9 +20,9 @@ pub fn acceleration_system(
 ) {
     const LIN_ACCEL: f32 = 0.01 / KILOMETER;
     for (mut acceleration, mut velocity, mut transform, global_transform) in query.iter_mut() {
-        let forward = global_transform.rotation * Vec3::X;
+        let forward = global_transform.rotation * Vec3::Z;
         let up = global_transform.rotation * Vec3::Y;
-        let right = global_transform.rotation * Vec3::Z;
+        let right = global_transform.rotation * Vec3::X;
 
         if keyboard_input.pressed(KeyCode::Q) {
             // acceleration. += Velocity::from_angular(AxisAngle::new(Vec3::X, 0.1));
