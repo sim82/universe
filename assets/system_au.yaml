@@ -33,7 +33,7 @@ satellites:
         radius: 1700.0
         appearance: moon_uv01/moon_uv01.gltf
         satellites: 
-        - name: ship
+        - name: shipx
           orbit: 0.00026
           orbit_time: 0
           day: 0
@@ -45,9 +45,9 @@ satellites:
     orbit_time: 686.980
     day: 1.0
     radius: 3389.5
-    appearance: moon_uv01/moon_uv01.gltf
+    appearance: mars_uv01/mars_uv01.gltf
     satellites: 
-      - name: shipy
+      - name: ship
         orbit: 0.0026
         orbit_time: 0
         day: 0
