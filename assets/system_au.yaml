@@ -3,27 +3,83 @@ orbit: 0.0
 orbit_time: 0.0
 day: -365.0
 radius: 1400000.0
-appearance: earth_gltf02/earth.gltf
+appearance: earth_uv01/earth_uv01.gltf
 satellites:
+  - name: mercury
+    orbit: 0.46
+    orbit_time: 87.9601
+    appearance: xmoon_uv01/moon_uv01.gltf
+    day: 1.0
+    radius: 4880.0
+    satellites: []
+  - name: venus
+    orbit: 0.723332
+    orbit_time: 224.701
+    appearance: moon_uv01/moon_uv01.gltf
+    day: 1.0
+    radius: 6051.8
+    satellites: []
   - name: earth
     orbit: 1.0
     orbit_time: 365.0
     day: 1.0
     radius: 6100.0
-    appearance: earth_gltf02/earth.gltf
+    appearance: earth_uv01/earth_uv01.gltf
     satellites:
       - name: moon
         orbit: 0.00257
         orbit_time: 31.0
         day: 31.0
-        satellites: []
         radius: 1700.0
-        appearance: moon_gltf01/moon.gltf
-      - name: ship
+        appearance: moon_uv01/moon_uv01.gltf
+        satellites: 
+        - name: ship
+          orbit: 0.00026
+          orbit_time: 0
+          day: 0
+          radius: 0
+          satellites: []
+          appearance: none
+  - name: mars
+    orbit: 1.523679
+    orbit_time: 686.980
+    day: 1.0
+    radius: 3389.5
+    appearance: moon_uv01/moon_uv01.gltf
+    satellites: 
+      - name: shipy
         orbit: 0.0026
         orbit_time: 0
         day: 0
         radius: 0
         satellites: []
         appearance: none
+  - name: jupiter
+    orbit: 5.2044
+    orbit_time: 4332.59
+    day: 1.0
+    radius: 69911.0
+    appearance: moon_uv01/moon_uv01.gltf
+    satellites: []
+  - name: saturn
+    orbit: 9.5862
+    orbit_time: 10759.22
+    day: 1.0
+    radius: 58232
+    appearance: moon_uv01/moon_uv01.gltf
+    satellites: []
+  - name: uranus
+    orbit: 19.19126
+    orbit_time: 30688.5
+    day: 1.0
+    radius: 25362
+    appearance: moon_uv01/moon_uv01.gltf
+    satellites: []
+  - name: neptune
+    orbit: 30.07
+    orbit_time: 60195
+    day: 1.0
+    radius: 24622
+    appearance: moon_uv01/moon_uv01.gltf
+    satellites: []
     

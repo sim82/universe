@@ -48,6 +48,7 @@ fn main() {
             title: String::from("Project Universe"),
             ..Default::default()
         })
+        .insert_resource(Msaa { samples: 4 })
         .add_plugins(DefaultPlugins)
         .add_plugin(PhysicsPlugin::default())
         .add_startup_system(setup)
@@ -56,7 +57,7 @@ fn main() {
         // .add_system(animate_light_direction)
         .add_system(animate_camera)
         .add_system(turn_earth)
-        .add_system(rotation_system)
+        // .add_system(rotation_system)
         .add_system(ship::acceleration_system)
         .run();
 }
@@ -235,7 +236,7 @@ fn spawn_ship(
             far: 40.0 * AU_TO_UNIT,
             aspect_ratio: 1.0,
         };
-        let elevate = 0.5;
+        let elevate = 0.0;
         let _ship = commands
             .spawn_bundle(TransformNodeBundle::default())
             .insert(Transform {
