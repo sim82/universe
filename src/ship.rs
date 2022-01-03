@@ -1,7 +1,11 @@
 use bevy::prelude::*;
 use heron::*;
 
-use crate::consts::KILOMETER;
+use crate::{
+    consts::KILOMETER,
+    prelude::KM_TO_UNIT,
+    property::{PropertyUpdateEvent, PropertyValue},
+};
 
 #[derive(Component)]
 pub struct Ship {}
@@ -53,5 +57,31 @@ pub fn acceleration_system(
         }
         // info!("vel: {:?}", velocity);
         // info!("transform: {:?}", forward);
+    }
+}
+
+pub fn update_properties_system(
+    mut property_update_events: EventWriter<PropertyUpdateEvent>,
+    mut query: Query<
+        (
+            &mut Acceleration,
+            &mut Velocity,
+            &mut Transform,
+            &GlobalTransform,
+        ),
+        With<Ship>,
+    >,
+) {
+    for (mut acceleration, mut velocity, mut transform, global_transform) in query.iter_mut() {
+        let vel = velocity.linear.length();
+
+        property_update_events.send(PropertyUpdateEvent::new(
+            "ship.velocity".to_string(),
+            PropertyValue::Float(vel / KM_TO_UNIT),
+        ));
+        property_update_events.send(PropertyUpdateEvent::new(
+            "ship.position".to_string(),
+            PropertyValue::Vec3(global_transform.translation),
+        ));
     }
 }

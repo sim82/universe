@@ -6,11 +6,12 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-bevy = { git = "https://github.com/bevyengine/bevy", features = ["dynamic"] }
+bevy = { git = "https://github.com/bevyengine/bevy", branch="main", features = ["dynamic"] }
+bevy_egui = { git = "https://github.com/jakobhellermann/bevy_egui.git", branch = "bevy-main", default-features=false }
 log = "0.4"
 anyhow = { version="1"}
 rand = "0.8"
 serde = { version = "1", features = ["derive"] }
 serde_json = { version="1" }
 serde_yaml = "0.8"
-heron = { git = "https://github.com/jcornaz/heron.git", branch = "bevy-main", features = ["3d"] }
+heron = { git = "https://github.com/sim82/heron.git", branch = "bevy-main", features = ["3d"] }

@@ -1,5 +1,10 @@
+#![feature(slice_group_by)]
+
 use serde::{Deserialize, Serialize};
 
+pub mod hud;
+pub mod hud_egui;
+pub mod property;
 pub mod ship;
 
 pub mod prelude {

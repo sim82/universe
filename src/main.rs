@@ -1,6 +1,17 @@
-use bevy::{prelude::*, reflect::TypeRegistry, render::primitives::Frustum, scene::InstanceId};
+use bevy::{
+    diagnostic::{EntityCountDiagnosticsPlugin, FrameTimeDiagnosticsPlugin},
+    prelude::*,
+    reflect::TypeRegistry,
+    render::primitives::Frustum,
+    scene::InstanceId,
+};
+use bevy_egui::EguiPlugin;
 use heron::*;
-use universe::prelude::*;
+use universe::{
+    hud_egui::{hud_egui_setup_system, HudEguiPlugin},
+    prelude::*,
+    property,
+};
 
 #[derive(Component)]
 struct Planet {
@@ -41,6 +52,13 @@ enum InSystemVisibility {
 
 fn main() {
     App::new()
+        .add_plugins(DefaultPlugins)
+        .add_plugin(PhysicsPlugin::default())
+        .add_plugin(EguiPlugin)
+        .add_plugin(HudEguiPlugin)
+        .add_plugin(property::PropertyPlugin)
+        .add_plugin(FrameTimeDiagnosticsPlugin::default())
+        .add_plugin(EntityCountDiagnosticsPlugin::default())
         .register_type::<Center>()
         .insert_resource(WindowDescriptor {
             width: 1270.0,
@@ -49,16 +67,15 @@ fn main() {
             ..Default::default()
         })
         .insert_resource(Msaa { samples: 4 })
-        .add_plugins(DefaultPlugins)
-        .add_plugin(PhysicsPlugin::default())
         .add_startup_system(setup)
         .add_system(spawn_planets)
         .add_system(spawn_ship)
         .add_system(animate_light_direction)
         .add_system(animate_camera)
         .add_system(turn_earth)
-        .add_system(rotation_system)
+        // .add_system(rotation_system)
         .add_system(ship::acceleration_system)
+        .add_system(ship::update_properties_system)
         .run();
 }
 
@@ -180,7 +197,7 @@ fn setup(
                 far: 10.0 * HALF_SIZE,
                 ..Default::default()
             },
-            shadows_enabled: false,
+            shadows_enabled: true,
             ..Default::default()
         },
         ..Default::default()
