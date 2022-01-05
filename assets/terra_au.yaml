@@ -1,0 +1,22 @@
+name: earth
+orbit: 0.0
+orbit_time: 0.0
+day: 1.0
+radius: 6100.0
+appearance: earth_uv01/earth_uv01.gltf
+satellites:
+  - name: moon
+    orbit: 0.00257
+    orbit_time: 31.0
+    day: 31.0
+    radius: 1700.0
+    appearance: moon_uv01/moon_uv01.gltf
+    satellites: 
+    - name: ship
+      orbit: 0.00026
+      orbit_time: 0
+      day: 0
+      radius: 0
+      satellites: []
+      appearance: none
+    

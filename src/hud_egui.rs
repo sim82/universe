@@ -140,7 +140,8 @@ pub fn hud_egui_system(
                                 Ok((property_access, _)) => match &property_access.cache {
                                     PropertyValue::String(s) => s.clone(),
                                     PropertyValue::Vec3(v) | PropertyValue::Color(v) => {
-                                        format!("{:.3e} {:.3e} {:.3e}", v.x, v.y, v.z)
+                                        // format!("{:.3e} {:.3e} {:.3e}", v.x, v.y, v.z)
+                                        format!("{:e} {:e} {:e}", v.x, v.y, v.z)
                                     }
                                     PropertyValue::Float(f) => {
                                         format!("{:.3}", f)

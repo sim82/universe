@@ -70,10 +70,11 @@ fn main() {
             ..Default::default()
         })
         .insert_resource(Msaa { samples: 4 })
+        .insert_resource(ClearColor(Color::BLACK))
         .add_startup_system(setup)
         .add_system(spawn_planets)
         .insert_resource(SpawnTimer {
-            timer: Timer::from_seconds(0.1, true),
+            timer: Timer::from_seconds(0.100, true),
         })
         .add_system(spawn_ship)
         .add_system(dump_asset_status)
@@ -151,7 +152,7 @@ fn setup(
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
     let sun: universe::Body = serde_yaml::from_reader(std::io::BufReader::new(
-        std::fs::File::open("assets/system_au.yaml").unwrap(),
+        std::fs::File::open("assets/terra_au.yaml").unwrap(),
     ))
     .unwrap();
 
@@ -263,12 +264,22 @@ fn spawn_planets(
     }
 }
 
-fn dump_asset_status(asset_server: Res<AssetServer>, mut query: Query<&Handle<Mesh>>) {
-    for mesh in query.iter() {
-        let path = asset_server.get_handle_path(mesh);
-        let state = asset_server.get_load_state(mesh);
-        info!("state: {:?} {:?}", path, state);
-    }
+fn dump_asset_status(
+    asset_server: Res<AssetServer>,
+    query: Query<&Handle<Mesh>>,
+    query_image: Query<&Handle<StandardMaterial>>,
+) {
+    // for mesh in query.iter() {
+    //     let path = asset_server.get_handle_path(mesh);
+    //     let state = asset_server.get_load_state(mesh);
+    //     info!("mesh: {:?} {:?}", path, state);
+    // }
+
+    // for image in query_image.iter() {
+    //     let path = asset_server.get_handle_path(image);
+    //     let state = asset_server.get_load_state(image);
+    //     info!("image: {:?} {:?}", path, state);
+    // }
 }
 
 fn spawn_ship(
@@ -348,7 +359,7 @@ fn turn_earth(time: Res<Time>, mut query: Query<(&mut Transform, &Planet)>) {
 
 fn rotation_system(time: Res<Time>, mut query: Query<(&mut Transform, &Rotation)>) {
     for (mut transform, rotation) in query.iter_mut() {
-        transform.rotation *= Quat::from_rotation_y(rotation.vel * 1.0e0 * time.delta_seconds());
+        transform.rotation *= Quat::from_rotation_y(rotation.vel * 1.0e-1 * time.delta_seconds());
         // transform.translation.x += 1000.0;
         // info!("camera: {:?} {:?}", transform.translation, frustum);
     }

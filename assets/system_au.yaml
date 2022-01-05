@@ -2,18 +2,25 @@ name: sun
 orbit: 0.0
 orbit_time: 0.0
 day: -365.0
-radius: 140000.0
-appearance: earth_uv01/earth_uv01.gltf
+radius: 1400000.0
+appearance: sun_uv01/sun_uv01.gltf
 satellites:
+  - name: ships
+    orbit: 0.026
+    orbit_time: 0
+    day: 0
+    radius: 0
+    satellites: []
+    appearance: none
   - name: mercury
-    orbit: 0.46
+    orbit: 5.46
     orbit_time: 87.9601
     appearance: mercury_uv01/mercury_uv01.gltf
     day: 1.0
     radius: 4880.0
     satellites: 
-      - name: shipm
-        orbit: 0.0026
+      - name: ship
+        orbit: 0.00016
         orbit_time: 0
         day: 0
         radius: 0
@@ -54,7 +61,7 @@ satellites:
           radius: 0
           satellites: []
           appearance: none
-      - name: ship
+      - name: shipt
         orbit: 0.00076
         orbit_time: 0
         day: 0
@@ -125,7 +132,7 @@ satellites:
     appearance: neptune_uv01/neptune_uv01.gltf
     satellites: 
       - name: shipn
-        orbit: 0.026
+        orbit: 0.0046
         orbit_time: 0
         day: 0
         radius: 0
