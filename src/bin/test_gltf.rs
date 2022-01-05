@@ -13,7 +13,7 @@ fn main() {
 }
 
 fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
-    commands.spawn_scene(asset_server.load("models/earth_uv01/earth_uv01.gltf#Scene0"));
+    commands.spawn_scene(asset_server.load("models/neptune_uv01/neptune_uv01.gltf#Scene0"));
     commands.spawn_bundle(PerspectiveCameraBundle {
         transform: Transform::from_xyz(1.7, 1.7, 1.0).looking_at(Vec3::new(0.0, 0.3, 0.0), Vec3::Y),
         ..Default::default()

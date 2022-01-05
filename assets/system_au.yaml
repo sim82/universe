@@ -8,17 +8,31 @@ satellites:
   - name: mercury
     orbit: 0.46
     orbit_time: 87.9601
-    appearance: moon_uv01/moon_uv01.gltf
+    appearance: mercury_uv01/mercury_uv01.gltf
     day: 1.0
     radius: 4880.0
-    satellites: []
+    satellites: 
+      - name: shipm
+        orbit: 0.0026
+        orbit_time: 0
+        day: 0
+        radius: 0
+        satellites: []
+        appearance: none
   - name: venus
     orbit: 0.723332
     orbit_time: 224.701
-    appearance: moon_uv01/moon_uv01.gltf
+    appearance: venus_uv01/venus_uv01.gltf
     day: 1.0
     radius: 6051.8
-    satellites: []
+    satellites: 
+      - name: shipv
+        orbit: 0.0026
+        orbit_time: 0
+        day: 0
+        radius: 0
+        satellites: []
+        appearance: none
   - name: earth
     orbit: 1.0
     orbit_time: 365.0
@@ -33,13 +47,20 @@ satellites:
         radius: 1700.0
         appearance: moon_uv01/moon_uv01.gltf
         satellites: 
-        - name: ship
+        - name: shipl
           orbit: 0.00026
           orbit_time: 0
           day: 0
           radius: 0
           satellites: []
           appearance: none
+      - name: ship
+        orbit: 0.00076
+        orbit_time: 0
+        day: 0
+        radius: 0
+        satellites: []
+        appearance: none
   - name: mars
     orbit: 1.523679
     orbit_time: 686.980
@@ -59,27 +80,55 @@ satellites:
     orbit_time: 4332.59
     day: 1.0
     radius: 69911.0
-    appearance: moon_uv01/moon_uv01.gltf
-    satellites: []
+    appearance: jupiter_uv01/jupiter_uv01.gltf
+    satellites: 
+      - name: shipj
+        orbit: 0.026
+        orbit_time: 0
+        day: 0
+        radius: 0
+        satellites: []
+        appearance: none
   - name: saturn
     orbit: 9.5862
     orbit_time: 10759.22
     day: 1.0
     radius: 58232
-    appearance: moon_uv01/moon_uv01.gltf
-    satellites: []
+    appearance: saturn_uv01/saturn_uv01.gltf
+    satellites: 
+      - name: ships
+        orbit: 0.026
+        orbit_time: 0
+        day: 0
+        radius: 0
+        satellites: []
+        appearance: none
   - name: uranus
     orbit: 19.19126
     orbit_time: 30688.5
     day: 1.0
     radius: 25362
-    appearance: moon_uv01/moon_uv01.gltf
-    satellites: []
+    appearance: uranus_uv01/uranus_uv01.gltf
+    satellites: 
+      - name: shipu
+        orbit: 0.026
+        orbit_time: 0
+        day: 0
+        radius: 0
+        satellites: []
+        appearance: none
   - name: neptune
     orbit: 30.07
     orbit_time: 60195
     day: 1.0
     radius: 24622
-    appearance: moon_uv01/moon_uv01.gltf
-    satellites: []
+    appearance: neptune_uv01/neptune_uv01.gltf
+    satellites: 
+      - name: shipn
+        orbit: 0.026
+        orbit_time: 0
+        day: 0
+        radius: 0
+        satellites: []
+        appearance: none
     

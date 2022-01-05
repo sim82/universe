@@ -257,10 +257,10 @@ pub fn hud_egui_system(
             // let points = egui::plot::Points::new(plot_diagnostic.buf);
             // .stems(-1.5)
             // .radius(1.0);
-            let plot = egui::plot::Plot::new("diag").line(points).include_y(0.0);
-            egui::Window::new(&plot_diagnostic.name).show(egui_context.ctx(), |ui| {
-                ui.add(plot);
-            });
+            // let plot = egui::plot::Plot::new("diag").line(points).include_y(0.0);
+            // egui::Window::new(&plot_diagnostic.name).show(egui_context.ctx(), |ui| {
+            //     ui.add(plot);
+            // });
         }
     }
 }

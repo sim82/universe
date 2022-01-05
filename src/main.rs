@@ -1,4 +1,5 @@
 use bevy::{
+    asset::Asset,
     diagnostic::{EntityCountDiagnosticsPlugin, FrameTimeDiagnosticsPlugin},
     prelude::*,
     reflect::TypeRegistry,
@@ -22,6 +23,7 @@ struct Planet {
 struct Center {
     vel: f32,
     name: String,
+    spawned: bool,
 }
 
 #[derive(Component)]
@@ -36,6 +38,7 @@ impl Center {
         Center {
             vel: 0.0,
             name: name.to_string(),
+            spawned: false,
         }
     }
 }
@@ -69,7 +72,11 @@ fn main() {
         .insert_resource(Msaa { samples: 4 })
         .add_startup_system(setup)
         .add_system(spawn_planets)
+        .insert_resource(SpawnTimer {
+            timer: Timer::from_seconds(0.1, true),
+        })
         .add_system(spawn_ship)
+        .add_system(dump_asset_status)
         .add_system(animate_light_direction)
         .add_system(animate_camera)
         .add_system(turn_earth)
@@ -77,6 +84,10 @@ fn main() {
         .add_system(ship::acceleration_system)
         .add_system(ship::update_properties_system)
         .run();
+}
+
+struct SpawnTimer {
+    timer: Timer,
 }
 
 #[derive(Bundle, Clone, Default)]
@@ -205,15 +216,28 @@ fn setup(
 }
 
 fn spawn_planets(
+    time: Res<Time>,
+    mut spawn_timer: ResMut<SpawnTimer>,
     mut commands: Commands,
     asset_server: Res<AssetServer>,
     mut materials: ResMut<Assets<StandardMaterial>>,
-    mut query: Query<(Entity, &Center, &BodyAppearance, &GlobalTransform), Added<Center>>,
+    mut query: Query<
+        (Entity, &mut Center, &BodyAppearance, &GlobalTransform), /* , Added<Center>*/
+    >,
 ) {
-    for (entity, center, appearance, global_transform) in query.iter() {
+    spawn_timer.timer.tick(time.delta());
+    if !spawn_timer.timer.just_finished() {
+        return;
+    }
+
+    for (entity, mut center, appearance, global_transform) in query.iter_mut() {
         if center.name.starts_with("ship") {
             continue;
         }
+        if center.spawned {
+            continue;
+        }
+
         info!(
             "spawn {} {} {} {}",
             center.name, appearance.model, appearance.radius, appearance.vel
@@ -234,6 +258,16 @@ fn spawn_planets(
                 vel: appearance.vel,
             });
         });
+        center.spawned = true;
+        break;
+    }
+}
+
+fn dump_asset_status(asset_server: Res<AssetServer>, mut query: Query<&Handle<Mesh>>) {
+    for mesh in query.iter() {
+        let path = asset_server.get_handle_path(mesh);
+        let state = asset_server.get_load_state(mesh);
+        info!("state: {:?} {:?}", path, state);
     }
 }
 
